@@ -13,7 +13,9 @@ PARES_OTC_FIJOS = "EURUSD-OTC,GBPUSD-OTC,USDCHF-OTC"
 HTML = """
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
 <meta charset="UTF-8">
 <title>GKTraderBot</title>
 
@@ -69,10 +71,6 @@ body{
     font-weight:bold;
 }
 
-form{
-    margin-top:20px;
-}
-
 input,select{
     width:100%;
     padding:12px;
@@ -125,14 +123,21 @@ label{
     margin-bottom:20px;
 }
 
+a{
+    text-decoration:none;
+}
+
 </style>
+
 </head>
 
 <body>
 
 <div class="container">
 
-<div class="title">GKTraderBot</div>
+<div class="title">
+GKTraderBot
+</div>
 
 <div class="subtitle">
 Panel profesional para IQ Option OTC
@@ -140,17 +145,17 @@ Panel profesional para IQ Option OTC
 
 <div class="actions">
 
-<form method="POST" action="/start" style="margin:0;">
-<button type="submit" class="btn-start">
+<a href="/start">
+<button type="button" class="btn-start">
 ▶ Iniciar Bot
 </button>
-</form>
+</a>
 
-<form method="POST" action="/stop" style="margin:0;">
-<button type="submit" class="btn-stop">
+<a href="/stop">
+<button type="button" class="btn-stop">
 ■ Detener Bot
 </button>
-</form>
+</a>
 
 </div>
 
@@ -158,22 +163,30 @@ Panel profesional para IQ Option OTC
 
 <div class="card">
 <h2>Estado</h2>
-<div class="stat">{{state.get("estado","DETENIDO")}}</div>
+<div class="stat">
+{{state.get("estado","DETENIDO")}}
+</div>
 </div>
 
 <div class="card">
 <h2>Operaciones</h2>
-<div class="stat">{{state.get("operaciones",0)}}</div>
+<div class="stat">
+{{state.get("operaciones",0)}}
+</div>
 </div>
 
 <div class="card">
 <h2>Ganadas</h2>
-<div class="stat">{{state.get("ganadas",0)}}</div>
+<div class="stat">
+{{state.get("ganadas",0)}}
+</div>
 </div>
 
 <div class="card">
 <h2>Perdidas</h2>
-<div class="stat">{{state.get("perdidas",0)}}</div>
+<div class="stat">
+{{state.get("perdidas",0)}}
+</div>
 </div>
 
 </div>
@@ -221,9 +234,11 @@ REAL
 <label>Pares OTC fijos</label>
 
 <div class="info-box">
+
 EURUSD-OTC<br>
 GBPUSD-OTC<br>
 USDCHF-OTC
+
 </div>
 
 <button type="submit" class="btn-start">
@@ -288,7 +303,7 @@ def state():
     return jsonify(get_state())
 
 
-@app.route("/start", methods=["POST"])
+@app.route("/start", methods=["GET", "POST"])
 def start():
 
     global bot_thread
@@ -318,7 +333,7 @@ def start():
     return redirect("/")
 
 
-@app.route("/stop", methods=["POST"])
+@app.route("/stop", methods=["GET", "POST"])
 def stop():
 
     print("BOT DETENIDO")
