@@ -147,7 +147,7 @@ class GKTraderBot:
         if not email or not password:
             raise RuntimeError("Falta configurar email o password")
 
-        print("Conectando a IQ Option...")
+        print("Conectando a IQ Option...", flush=True)
 
         self.iq = IQ_Option(email, password)
         check, reason = self.iq.connect()
@@ -155,12 +155,9 @@ class GKTraderBot:
         if not check:
             raise RuntimeError(f"No se pudo conectar a IQ Option: {reason}")
 
-        if cuenta != "PRACTICE":
-            cuenta = "PRACTICE"
+        self.iq.change_balance("PRACTICE")
 
-        self.iq.change_balance(cuenta)
-
-        print("IQ Option conectado correctamente")
+        print("IQ Option conectado correctamente", flush=True)
 
         return True
 
@@ -192,12 +189,17 @@ class GKTraderBot:
         timeframe = int(self.config["ESTRATEGIA"].get("timeframe", 60))
         cantidad = int(self.config["ESTRATEGIA"].get("cantidad_velas", 250))
 
+        print(f"Pidiendo velas de {activo}...", flush=True)
+
         candles = self.iq.get_candles(
             activo,
             timeframe,
             cantidad,
             time.time()
         )
+
+        if not candles:
+            raise RuntimeError(f"No llegaron velas para {activo}")
 
         df = pd.DataFrame(candles)
 
@@ -207,6 +209,7 @@ class GKTraderBot:
         df = self.obtener_velas(activo)
 
         if len(df) < 100:
+            print(f"Pocas velas para {activo}: {len(df)}", flush=True)
             return None
 
         df["EMA9"] = ema(df["close"], 9)
@@ -231,6 +234,11 @@ class GKTraderBot:
 
         rsi_put_min = float(self.config["ESTRATEGIA"].get("rsi_put_min", 30))
         rsi_put_max = float(self.config["ESTRATEGIA"].get("rsi_put_max", 45))
+
+        print(
+            f"{activo} | Precio: {precio} | RSI: {ultima['RSI']:.2f} | ADX: {ultima['ADX']:.2f}",
+            flush=True
+        )
 
         call_ok = (
             precio > ultima["EMA200"]
@@ -282,6 +290,7 @@ class GKTraderBot:
         auto_operar = self.config["GENERAL"].get("auto_operar", "N").strip().upper()
 
         if auto_operar != "S":
+            print("Señal detectada, pero AUTO_OPERAR está desactivado", flush=True)
             return {
                 "status": "signal_only",
                 "profit": 0.0
@@ -292,6 +301,11 @@ class GKTraderBot:
 
         self.iq.change_balance("PRACTICE")
 
+        print(
+            f"Ejecutando operación {senal['activo']} {senal['direccion']} monto {monto}",
+            flush=True
+        )
+
         status, trade_id = self.iq.buy(
             monto,
             senal["activo"],
@@ -300,6 +314,7 @@ class GKTraderBot:
         )
 
         if not status:
+            print("Operación rechazada por IQ Option", flush=True)
             return {
                 "status": "rejected",
                 "profit": 0.0
@@ -311,6 +326,8 @@ class GKTraderBot:
             resultado = self.iq.check_win_v4(trade_id)
             time.sleep(1)
 
+        print(f"Resultado operación: {resultado}", flush=True)
+
         return {
             "status": "closed",
             "profit": float(resultado or 0.0),
@@ -318,7 +335,7 @@ class GKTraderBot:
         }
 
     def run_forever(self):
-        print("INICIANDO BOT...")
+        print("INICIANDO BOT...", flush=True)
 
         clear_stop()
 
@@ -334,7 +351,7 @@ class GKTraderBot:
             self.connect()
 
         except Exception as e:
-            print("ERROR CONEXION:", e)
+            print("ERROR CONEXION:", e, flush=True)
 
             state = get_state()
             state.update({
@@ -353,7 +370,7 @@ class GKTraderBot:
         })
         set_state(state)
 
-        print("BOT INICIADO CORRECTAMENTE")
+        print("BOT INICIADO CORRECTAMENTE", flush=True)
 
         self.enviar_telegram("🚀 GKTraderBot iniciado")
 
@@ -367,7 +384,7 @@ class GKTraderBot:
                 if stop_requested():
                     break
 
-                print(f"Analizando {activo}")
+                print(f"Analizando {activo}", flush=True)
 
                 state = get_state()
                 state["estado"] = "ACTIVO"
@@ -378,7 +395,7 @@ class GKTraderBot:
                     senal = self.analizar(activo)
 
                 except Exception as e:
-                    print(f"ERROR ANALIZANDO {activo}:", e)
+                    print(f"ERROR ANALIZANDO {activo}: {e}", flush=True)
 
                     state = get_state()
                     state["status"] = f"Error analizando {activo}: {e}"
@@ -389,7 +406,7 @@ class GKTraderBot:
 
                 if senal and time.time() - ultimo_envio >= cooldown:
 
-                    print("SEÑAL ENCONTRADA:", senal)
+                    print("SEÑAL ENCONTRADA:", senal, flush=True)
 
                     hora = datetime.now().strftime("%H:%M:%S")
 
@@ -440,7 +457,7 @@ class GKTraderBot:
 
             time.sleep(3)
 
-        print("BOT DETENIDO")
+        print("BOT DETENIDO", flush=True)
 
         state = get_state()
 
