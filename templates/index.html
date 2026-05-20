@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>GKTraderBot</title>
+
+<style>
+
+body{
+    background:#0f172a;
+    color:white;
+    font-family:Arial;
+    padding:20px;
+}
+
+.card{
+    background:#1e293b;
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:20px;
+}
+
+input,select{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+}
+
+button{
+    padding:15px 25px;
+    border:none;
+    border-radius:10px;
+    font-size:18px;
+    cursor:pointer;
+    margin-right:10px;
+}
+
+.start{
+    background:#22c55e;
+    color:white;
+}
+
+.stop{
+    background:#ef4444;
+    color:white;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:15px;
+}
+
+h1{
+    font-size:55px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>GKTraderBot</h1>
+
+<p>Panel profesional para IQ Option OTC</p>
+
+<a href="/start">
+<button class="start">▶ Iniciar Bot</button>
+</a>
+
+<a href="/stop">
+<button class="stop">■ Detener Bot</button>
+</a>
+
+<br><br>
+
+<div class="stats">
+
+<div class="card">
+<h2>Estado</h2>
+<h1>{{ state.estado }}</h1>
+</div>
+
+<div class="card">
+<h2>Operaciones</h2>
+<h1>{{ state.operaciones }}</h1>
+</div>
+
+<div class="card">
+<h2>Ganadas</h2>
+<h1>{{ state.ganadas }}</h1>
+</div>
+
+<div class="card">
+<h2>Perdidas</h2>
+<h1>{{ state.perdidas }}</h1>
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Configuración</h2>
+
+<form action="/save" method="POST">
+
+<label>Email IQ Option</label>
+<input type="text" name="email">
+
+<label>Password IQ Option</label>
+<input type="password" name="password">
+
+<label>Cuenta</label>
+<select name="cuenta">
+<option value="PRACTICE">PRACTICE</option>
+</select>
+
+<label>Token Telegram</label>
+<input type="text" name="token">
+
+<label>Chat ID Telegram</label>
+<input type="text" name="chat_id">
+
+<br><br>
+
+<button class="start" type="submit">
+Guardar Configuración
+</button>
+
+</form>
+
+</div>
+
+</body>
+</html>
