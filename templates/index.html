@@ -5,106 +5,67 @@
 <title>GKTraderBot</title>
 
 <style>
-
-body{
-    background:#0f172a;
-    color:white;
-    font-family:Arial;
-    padding:20px;
-}
-
-.card{
-    background:#1e293b;
-    padding:20px;
-    border-radius:15px;
-    margin-bottom:20px;
-}
-
-input,select{
-    width:100%;
-    padding:12px;
-    margin-top:10px;
-    border:none;
-    border-radius:10px;
-}
-
-button{
-    padding:15px 25px;
-    border:none;
-    border-radius:10px;
-    font-size:18px;
-    cursor:pointer;
-    margin-right:10px;
-}
-
-.start{
-    background:#22c55e;
-    color:white;
-}
-
-.stop{
-    background:#ef4444;
-    color:white;
-}
-
-.stats{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:15px;
-}
-
-h1{
-    font-size:55px;
-}
-
+body{background:#0f172a;color:white;font-family:Arial;margin:0;padding:0;}
+.container{width:95%;max-width:1200px;margin:auto;padding:20px;}
+.title{font-size:42px;font-weight:bold;margin-bottom:5px;}
+.subtitle{color:#94a3b8;margin-bottom:30px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;}
+.card{background:#1e293b;border-radius:18px;padding:20px;box-shadow:0 0 20px rgba(0,0,0,0.3);}
+.card h2{margin-top:0;font-size:18px;color:#38bdf8;}
+.stat{font-size:34px;font-weight:bold;}
+input,select{width:100%;padding:12px;border:none;border-radius:10px;margin-top:8px;margin-bottom:18px;background:#334155;color:white;font-size:15px;box-sizing:border-box;}
+button{padding:14px 22px;border:none;border-radius:12px;font-size:16px;cursor:pointer;font-weight:bold;}
+.btn-start{background:#22c55e;color:white;}
+.btn-stop{background:#ef4444;color:white;}
+.actions{display:flex;gap:10px;margin-bottom:30px;}
+label{color:#cbd5e1;font-size:14px;}
+.info-box{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:15px;color:#cbd5e1;margin-bottom:20px;}
+a{text-decoration:none;}
 </style>
 </head>
 
 <body>
+<div class="container">
 
-<h1>GKTraderBot</h1>
+<div class="title">GKTraderBot</div>
+<div class="subtitle">Panel profesional para IQ Option OTC</div>
 
-<p>Panel profesional para IQ Option OTC</p>
-
+<div class="actions">
 <a href="/start">
-<button class="start">▶ Iniciar Bot</button>
+<button type="button" class="btn-start">▶ Iniciar Bot</button>
 </a>
 
 <a href="/stop">
-<button class="stop">■ Detener Bot</button>
+<button type="button" class="btn-stop">■ Detener Bot</button>
 </a>
+</div>
 
-<br><br>
-
-<div class="stats">
-
+<div class="grid">
 <div class="card">
 <h2>Estado</h2>
-<h1>{{ state.estado }}</h1>
+<div class="stat">{{ state.estado }}</div>
 </div>
 
 <div class="card">
 <h2>Operaciones</h2>
-<h1>{{ state.operaciones }}</h1>
+<div class="stat">{{ state.operaciones }}</div>
 </div>
 
 <div class="card">
 <h2>Ganadas</h2>
-<h1>{{ state.ganadas }}</h1>
+<div class="stat">{{ state.ganadas }}</div>
 </div>
 
 <div class="card">
 <h2>Perdidas</h2>
-<h1>{{ state.perdidas }}</h1>
+<div class="stat">{{ state.perdidas }}</div>
+</div>
 </div>
 
-</div>
-
-<div class="card">
+<form method="POST" action="/save">
+<div class="card" style="margin-top:30px;">
 
 <h2>Configuración</h2>
-
-<form action="/save" method="POST">
 
 <label>Email IQ Option</label>
 <input type="text" name="email">
@@ -117,21 +78,18 @@ h1{
 <option value="PRACTICE">PRACTICE</option>
 </select>
 
-<label>Token Telegram</label>
-<input type="text" name="token">
+<label>Pares OTC fijos</label>
+<div class="info-box">
+EURUSD-OTC<br>
+GBPUSD-OTC<br>
+USDCHF-OTC
+</div>
 
-<label>Chat ID Telegram</label>
-<input type="text" name="chat_id">
+<button type="submit" class="btn-start">Guardar Configuración</button>
 
-<br><br>
-
-<button class="start" type="submit">
-Guardar Configuración
-</button>
-
+</div>
 </form>
 
 </div>
-
 </body>
 </html>
