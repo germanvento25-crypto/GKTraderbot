@@ -13,116 +13,200 @@ bot_thread = None
 
 
 HTML = """
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <title>GKTraderBot</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body{margin:0;font-family:Arial;background:#0b1020;color:#fff}
-    .wrap{max-width:1100px;margin:auto;padding:24px}
-    .card{background:#141b34;border:1px solid #26345e;border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 8px 24px #0005}
-    h1{margin:0 0 8px;font-size:34px}
-    .brand{color:#00e5ff}
-    input,select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #32446f;background:#0b1020;color:#fff;margin:6px 0 12px}
-    label{font-size:14px;color:#b8c7ff}
-    button{border:0;border-radius:12px;padding:13px 18px;font-weight:bold;cursor:pointer;margin-right:8px}
-    .start{background:#00e676;color:#001b0b}
-    .stop{background:#ff5252;color:#fff}
-    .save{background:#40c4ff;color:#00131a}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
-    .stat{background:#0b1020;border-radius:14px;padding:16px;border:1px solid #26345e}
-    .stat b{font-size:24px;color:#00e5ff}
-    pre{white-space:pre-wrap;background:#080c18;border-radius:12px;padding:14px;color:#d7e1ff}
-    .warn{color:#ffd54f}
-  </style>
-</head>
-<body>
-<div class="wrap">
-  <div class="card">
-    <h1><span class="brand">GK</span>TraderBot</h1>
-    <p>Panel web local para señales OTC / IQ Option. Recomendado usar siempre en PRACTICE.</p>
-    <form method="post" action="/start" style="display:inline"><button class="start">▶ Iniciar bot</button></form>
-    <form method="post" action="/stop" style="display:inline"><button class="stop">■ Detener bot</button></form>
-  </div>
+<meta charset="UTF-8">
+<title>GKTraderBot</title>
 
-  <div class="grid">
-    <div class="stat">Estado<br><b id="status">{{state.status}}</b></div>
-    <div class="stat">Operaciones<br><b id="operaciones">{{state.operaciones}}</b></div>
-    <div class="stat">Ganadas<br><b id="wins">{{state.wins}}</b></div>
-    <div class="stat">Perdidas<br><b id="losses">{{state.losses}}</b></div>
-    <div class="stat">Ganancia<br><b id="ganancia">{{state.ganancia}}</b></div>
-  </div>
+<style>
 
-  <div class="card">
-    <h2>Configuración</h2>
-    <p class="warn">Auto operar queda bloqueado para REAL. Solo opera automático si cuenta = PRACTICE.</p>
-    <form method="post" action="/save">
-      <div class="grid">
-        <div>
-          <label>Email IQ Option</label>
-          <input name="email" value="{{cfg['IQOPTION']['email']}}">
-        </div>
-        <div>
-          <label>Password IQ Option</label>
-          <input name="password" type="password" value="{{cfg['IQOPTION']['password']}}">
-        </div>
-        <div>
-          <label>Cuenta</label>
-          <select name="cuenta">
-            <option value="PRACTICE" {% if cfg['GENERAL']['cuenta']=='PRACTICE' %}selected{% endif %}>PRACTICE / DEMO</option>
-            <option value="REAL" {% if cfg['GENERAL']['cuenta']=='REAL' %}selected{% endif %}>REAL</option>
-          </select>
-        </div>
-        <div>
-          <label>Auto operar</label>
-          <select name="auto_operar">
-            <option value="N" {% if cfg['GENERAL']['auto_operar']=='N' %}selected{% endif %}>No, solo señales</option>
-            <option value="S" {% if cfg['GENERAL']['auto_operar']=='S' %}selected{% endif %}>Sí, solo demo</option>
-          </select>
-        </div>
-        <div>
-          <label>Monto</label>
-          <input name="monto" value="{{cfg['GENERAL']['monto']}}">
-        </div>
-        <div>
-          <label>Expiración minutos</label>
-          <input name="tiempo_orden" value="{{cfg['GENERAL']['tiempo_orden']}}">
-        </div>
-        <div>
-          <label>Token Telegram</label>
-          <input name="token" value="{{cfg['TELEGRAM']['token']}}">
-        </div>
-        <div>
-          <label>Chat ID Telegram</label>
-          <input name="chat_id" value="{{cfg['TELEGRAM']['chat_id']}}">
-        </div>
-      </div>
-      <label>Activos</label>
-      <textarea name="pares" rows="3">{{cfg['ACTIVOS']['pares']}}</textarea>
-      <button class="save">Guardar configuración</button>
-    </form>
-  </div>
-
-  <div class="card">
-    <h2>Última señal</h2>
-    <pre id="ultima">{{state.ultima_senal}}</pre>
-  </div>
-</div>
-<script>
-async function refresh(){
-  const r = await fetch('/state');
-  const s = await r.json();
-  document.getElementById('status').innerText = s.status || '';
-  document.getElementById('operaciones').innerText = s.operaciones || 0;
-  document.getElementById('wins').innerText = s.wins || 0;
-  document.getElementById('losses').innerText = s.losses || 0;
-  document.getElementById('ganancia').innerText = s.ganancia || 0;
-  document.getElementById('ultima').innerText = s.ultima_senal || '';
+body{
+    background:#0f172a;
+    color:white;
+    font-family:Arial;
+    margin:0;
+    padding:0;
 }
-setInterval(refresh, 2000);
-</script>
+
+.container{
+    width:95%;
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+.title{
+    font-size:42px;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.subtitle{
+    color:#94a3b8;
+    margin-bottom:30px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:#1e293b;
+    border-radius:18px;
+    padding:20px;
+    box-shadow:0 0 20px rgba(0,0,0,0.3);
+}
+
+.card h2{
+    margin-top:0;
+    font-size:18px;
+    color:#38bdf8;
+}
+
+.stat{
+    font-size:34px;
+    font-weight:bold;
+}
+
+form{
+    margin-top:30px;
+}
+
+input,select{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    margin-top:8px;
+    margin-bottom:18px;
+    background:#334155;
+    color:white;
+    font-size:15px;
+}
+
+button{
+    padding:14px 22px;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btn-start{
+    background:#22c55e;
+    color:white;
+}
+
+.btn-stop{
+    background:#ef4444;
+    color:white;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    margin-bottom:30px;
+}
+
+label{
+    color:#cbd5e1;
+    font-size:14px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="title">GKTraderBot</div>
+
+<div class="subtitle">
+Panel profesional para IQ Option OTC
+</div>
+
+<div class="actions">
+<form method="POST" action="/start">
+<button class="btn-start">▶ Iniciar Bot</button>
+</form>
+
+<form method="POST" action="/stop">
+<button class="btn-stop">■ Detener Bot</button>
+</form>
+</div>
+
+<div class="grid">
+
+<div class="card">
+<h2>Estado</h2>
+<div class="stat">{{estado}}</div>
+</div>
+
+<div class="card">
+<h2>Operaciones</h2>
+<div class="stat">{{operaciones}}</div>
+</div>
+
+<div class="card">
+<h2>Ganadas</h2>
+<div class="stat">{{ganadas}}</div>
+</div>
+
+<div class="card">
+<h2>Perdidas</h2>
+<div class="stat">{{perdidas}}</div>
+</div>
+
+</div>
+
+<form method="POST" action="/save">
+
+<div class="card" style="margin-top:30px;">
+
+<h2>Configuración</h2>
+
+<label>Email IQ Option</label>
+<input type="text" name="email" value="{{email}}">
+
+<label>Password IQ Option</label>
+<input type="password" name="password" value="{{password}}">
+
+<label>Cuenta</label>
+<select name="cuenta">
+<option value="PRACTICE">PRACTICE</option>
+<option value="REAL">REAL</option>
+</select>
+
+<label>Monto</label>
+<input type="text" name="monto" value="{{monto}}">
+
+<label>Expiración (min)</label>
+<input type="text" name="tiempo_orden" value="{{tiempo_orden}}">
+
+<label>Telegram Token</label>
+<input type="text" name="token" value="{{token}}">
+
+<label>Telegram Chat ID</label>
+<input type="text" name="chat_id" value="{{chat_id}}">
+
+<label>Pares OTC</label>
+<input type="text" name="pares" value="{{pares}}">
+
+<button class="btn-start">
+Guardar Configuración
+</button>
+
+</div>
+
+</form>
+
+</div>
+
 </body>
 </html>
 """
