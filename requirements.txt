@@ -2,4 +2,4 @@ flask
 pandas
 requests
 websocket-client
-iqoptionapi
+git+https://github.com/iqoptionapi/iqoptionapi.git
